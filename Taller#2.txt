@@ -1,0 +1,263 @@
+#TALLER #2
+#Programación en lenguajes estadísticos
+
+#Julio Andres Miranda Sierra           #Estudiante 
+#Camilo Andres Mendoza Araujo          #Estudiante
+
+#Prof. José Francisco Ruiz Muñoz
+
+
+
+
+#PRIMER INCISO
+#Exportar el conjunto de datos gapminder en formato “csv”. El 5 %
+#de los valores de las columnas lifeEx, pop, y gdpPercap se debe
+#reemplazar de forma aleatoria por valores no asignados NA.
+
+#exportar los datos gapminder a formato "scv"
+data <- gapminder     
+setwd("C:/Users/julio/OneDrive/Escritorio/gapminder")
+write.table(gapminder, file = "dataa_ok.csv", sep = ":", row.names = F)
+
+#------
+#el 5% de los valores de las columnas lifeEx, pop, y gdpPercap 
+#fueron reemplazados de forma eleatoria a valores no asignados NA.
+
+#de esta manera verifico el numero de datos de del inciso
+length(gapminder$lifeExp)
+length(gapminder$pop)
+length(gapminder$gdpPercap)
+
+#en esta linea se indica la cantidad de valores NA por reemplazar 
+indices = sample(1:1704,85)
+
+#aplica los valores NA
+gapminder$lifeExp[indices] = NA
+gapminder$lifeExp
+
+gapminder$pop[indices] = NA
+gapminder$pop
+
+gapminder$gdpPercap[indices] = NA
+gapminder$gdpPercap
+
+#verifica si el procedimiento es correto, viendo si el programa gapminder 
+#optuvo las valores
+is.na.data.frame(gapminder)
+
+
+
+#---------------------------------------------------------
+#SEGUNDO INCISO
+#Importar el archivo gapminder en formato “csv”.
+
+#importe el formato csv utilizando el paquete de library(readr)
+file.choose()
+
+ruta_csv <- "C:\\Users\\julio\\OneDrive\\Escritorio\\gapminder\\data_gapminder.csv"
+
+library(readr)
+dataa_ok <- read_csv("dataa_ok.csv")
+View(dataa_ok)
+
+#---------------------------------------------------------
+#TERCER INCISO
+#Graficar el diagrama de dispersion lifeEx vs pop.
+
+gapminder %>%
+  filter(gdpPercap<5000) %>%
+  ggplot(aes(x=lifeExp,y=pop, col=continent))+geom_point()
+
+#---------------------------------------------------------
+#CUARTO INCISO
+#Graficar el diagrama de dispersion gdpPercap vs pop.
+
+gapminder %>%
+  filter(gdpPercap<5000) %>%
+  ggplot(aes(x=gdpPercap,y=pop, col=continent))+geom_point()
+
+#---------------------------------------------------------
+#QUINTO INCISO
+#Graficar los diagramas de cajas de la variable gdpPercap discriminados
+#por continentes desde 1990 a 2007.
+
+data <- gapminder[(year>=1990 & year <=2007) &
+                    continent=="Americas",]
+boxplot(data$gdpPercap)
+
+#para llevar a cabo este proceso se necesitaron ciertos pauquetes o 
+#librerias, las cuales dejaremos aca abajo.
+
+
+############################################################################
+##PUNDO 2
+
+#PRIMER INCISO
+# Cargar dos archivos de datos en formato “csv” llamados “Experimento a.csv”
+# y “Experimento b.csv” e indicar si la diferencia en la
+# media de los datos es estadisticamente significativa.
+
+Ex1 <- gapminder %>% filter(country == "Colombia") %>% filter(year > 1952)
+Experimento_a <- Ex1[,5]
+Ex2 <- gapminder %>% filter(country == "Argentina") %>% filter(year > 1952)
+Experimento_b <- Ex2[,5]
+
+t.test(Experimento_a,Experimento_b)
+#Las media de los datos no son estadisticamente significtiva ya que la hipotesis
+# nula es aceptada, ya que el valor pe es mayor que 0.05.
+
+
+#---------------------------------------------------------
+#SEGUNDO INCISO
+#Cargar dos archivos de datos en formato “csv” llamados “Experimento a.csv”
+#y “Experimento b.csv” y mostrar en pantalla la correlacion
+#de Pearson y Spearman de los datos.
+
+#TAREA UTILIZAR USE=EVERYTHING
+Experimento1_a <- gapminder$lifeExp
+Experimento2_b <- gapminder$gdpPercap
+
+A <- cor(Experimento1_a,Experimento2_b, method = "pearson")
+A
+B <-cor(Experimento1_a,Experimento2_b, method = "spearman")
+B
+
+#---------------------------------------------------------
+#TERCER INCISO
+#Cargar dos archivos de datos en formato “csv” llamados“Experimento a.csv”
+#y “Experimento b.csv” y graficar el diagrama de dispersion y la l´ınea
+#recta que aproxime los datos calculada por una regresi´on lineal por
+#minimos cuadrados.
+
+P <- lm(Experimento1_a~Experimento2_b)
+plot(gapminder$pop,gapminder$lifeExp, xlab = "Población", 
+     ylab = "Esperanza de vida ")
+abline(P, col = "red" )
+
+
+
+############################################################################
+##PUNTO 3
+
+#PRIMER INCISO
+
+#Graficar las funciones de densidad y distribucion de una distribucion
+#uniforme.
+
+#densidad
+#Function to plot the uniform density
+# x: grid of X-axis values (optional)
+# min: lower limit of the distribution (a)
+# max: upper limit of the distribution (b)
+# lwd: line width of the segments of the graph
+# col: color of the segments and points of the graph
+# ...: additional arguments to be passed to the plot function
+grafouniforme <- function(x, min = 0, max = 1, lwd = 1, col = 1, ...) {
+  
+  # Grid of X-axis values
+  if (missing(x)) {
+    x <- seq(min - 0.5, max + 0.5, 0.01)
+  }
+  
+  if(max < min) {
+    stop("'min' debe ser menor que 'max'")
+  }
+  
+  plot(x, dunif(x, min = min, max = max),
+       xlim = c(min - 0.25, max + 0.25), type = "l",
+       lty = 0, ylab = "f(x)", ...)
+  segments(min, 1/(max - min), max, 1/(max - min), col = col, lwd = lwd)
+  segments(min - 2, 0, min, 0, lwd = lwd, col = col)
+  segments(max, 0, max + 2, 0, lwd = lwd, col = col)
+  points(min, 1/(max - min), pch = 19, col = col)
+  points(max, 1/(max - min), pch = 19, col = col)
+  segments(min, 0, min, 1/(max - min), lty = 2, col = col, lwd = lwd)
+  segments(max, 0, max, 1/(max - min), lty = 2, col = col, lwd = lwd)
+  points(0, min, pch = 21, col = col, bg = "white")
+  points(max, min, pch = 21, col = col, bg = "white")
+}
+
+grafouniforme(min = 0, max = 1, lwd = 2, col = 4, main = "Densidad de una uniforme")
+
+
+
+#distribucion
+# Rejilla de valores del eje X
+Z <- seq(-0.5, 1.5, 0.01)
+
+# Distribución uniforme entre 0 y 1
+plot(Z, punif(Z, min = 0, max = 1), type = "l", main = "CDF uniforme",
+     ylab = "F(x)", lwd = 2, col = "red")
+
+# Equivalente a:
+plot(punif, -0.5, 1.5, type = "l", main = "CDF uniforme",
+     ylab = "F(x)", lwd = 2, col = "red")
+
+
+#--------------------------------------------------------------------
+#SEGUNDO INCISO
+
+#Graficar la funcion de densidad y distribucion de una distribucion
+#Bernoulli.
+
+#densidad
+x <- 0:1  # Soporte (dominio) de la variable
+Prob_bernu<- dbinom(x=x, size=1, prob=0.5)
+plot(x=x, y = Prob_bernu, 
+     type='h', las=1, lwd=10)
+
+#distribucion
+acumu_bernu<- pbinom(x, size=1, prob=0.5)
+plot(x=x, y = acumu_bernu, 
+     type='h', las=1, lwd=10)
+
+
+
+#---------------------------------------------------------------------
+#TERCER INCISO
+
+#Graficar la funcion de densidad y distribucion de una distribucion
+#Poisson.
+
+#densidad
+G <- 0:30
+lambda <- 4
+prob_pois <- dpois(x=G, lambda = 4)
+plot(prob_pois, type = "h", lwd = 5)
+
+#distribucion
+lambda <- 4
+acumu_pois <- ppois(G, lambda = 4,lower.tail = TRUE, log.p = FALSE)
+plot(acumu_pois, type = "h", lwd = 5)
+
+
+
+#--------------------------------------------------------------------
+#CUARTO INCISO
+
+#Graficar la funcion de densidad y distribucion de una distribucion
+#Exponencial.
+
+#densidad
+U <- seq(0,10,0.1)
+Prob_exp <- dexp(U, rate = 4)
+plot(U, Prob_exp , type = "p"
+     , lwd = 2, )
+
+#distribucion
+acumu_exp <- pexp(U, rate = 4)
+plot(U, acumu_exp , type = "p" )
+
+
+
+
+##Para poder correr los datos de programa utilizamos estas librerias 
+library(gapminder)
+attach(gapminder)
+library(ggplot2)
+library(dplyr)
+library(readr)
+##
+
+
+
